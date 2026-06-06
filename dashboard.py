@@ -9,6 +9,7 @@ Five professional upgrades:
   5. Protocol recommendation engine + PDF/CSV export
 """
 
+import os, sys
 import streamlit as st
 import streamlit.components.v1 as components
 import numpy as np
@@ -17,15 +18,24 @@ from plotly.subplots import make_subplots
 import pandas as pd
 import io, datetime
 
+# Ensure local package imports work even if Streamlit is launched from a different CWD.
+sys.path.insert(0, os.path.dirname(__file__))
+
 from inputs.surface_params import SurfaceInputs
 from inputs.drug_profiles   import plga_microsphere, dual_phase, scaffold_guided
 from signaling.piezo1_calcium       import Piezo1CalciumModule
 from signaling.yap_hippo            import YAPHippoModule
 from signaling.nfkb                 import NFkBModule
-from signaling.stat6                import STAT6Module
-from signaling.sasp_senescence      import (SenescenceInputs,
-                                             SASPSenescenceModule,
-                                             sasp_to_nfkb_amplification)
+try:
+    from signaling.sasp_senescence      import (SenescenceInputs,
+                                                 SASPSenescenceModule,
+                                                 sasp_to_nfkb_amplification)
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError(
+        "Failed to import signaling.sasp_senescence. "
+        "Make sure the app is run from the repository root and that dependencies are installed: "
+        "pip install -r requirements.txt"
+    ) from exc
 from phenotype.phenotype_classifier import PhenotypeClassifier
 from phenotype.fbgc_risk            import FBGCRiskModule
 from body import (
