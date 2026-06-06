@@ -19,7 +19,9 @@ import pandas as pd
 import io, datetime
 
 # Ensure local package imports work even if Streamlit is launched from a different CWD.
-sys.path.insert(0, os.path.dirname(__file__))
+repo_root = os.path.abspath(os.path.dirname(__file__))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
 
 from inputs.surface_params import SurfaceInputs
 from inputs.drug_profiles   import plga_microsphere, dual_phase, scaffold_guided
@@ -30,10 +32,10 @@ try:
     from signaling.sasp_senescence      import (SenescenceInputs,
                                                  SASPSenescenceModule,
                                                  sasp_to_nfkb_amplification)
-except ModuleNotFoundError as exc:
-    raise ModuleNotFoundError(
-        "Failed to import signaling.sasp_senescence. "
-        "Make sure the app is run from the repository root and that dependencies are installed: "
+except Exception as exc:
+    raise ImportError(
+        f"Failed to import signaling.sasp_senescence: {exc!r}. "
+        "Ensure the repository root is on PYTHONPATH, and that required packages are installed: "
         "pip install -r requirements.txt"
     ) from exc
 from phenotype.phenotype_classifier import PhenotypeClassifier
